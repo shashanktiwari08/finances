@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>The Daily Ledger — Shashank Tiwari</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #EFEAE0;
+    --paper-alt: #E4DDC9;
+    --card: #F7F4EC;
+    --ink: #1B2A4A;
+    --ink-soft: #545046;
+    --charcoal: #33312C;
+    --gold: #B8892B;
+    --gold-soft: #E9D9B4;
+    --green: #2F6F4E;
+    --green-soft: #DCE9DF;
+    --rust: #B4432E;
+    --rust-soft: #F1DCD5;
+    --line: #C9C0AC;
+    --line-soft: #DAD3BF;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(27,42,74,0.06), 0 4px 14px rgba(27,42,74,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important; transition:none!important;}
+  }
+  h1,h2,h3,.display{ font-family:'Zilla Slab', serif; letter-spacing:-0.01em; }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  a{color:inherit;}
+  button{ font-family:inherit; cursor:pointer; }
+  input,select,textarea{ font-family:inherit; }
+
+  #app{
+    display:flex;
+    min-height:100vh;
+    max-width:1180px;
+    margin:0 auto;
+  }
+
+  /* mobile-only top bar */
+  #mobileHeader{
+    display:none;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 16px;
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  #mobileHeader .brand-mark{ display:flex; align-items:center; gap:8px; }
+  #mobileHeader .glyph{
+    width:26px;height:26px; border:1.5px solid var(--ink); border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Zilla Slab',serif; font-weight:700; font-size:12px;
+    color:var(--ink); background:var(--gold-soft); flex-shrink:0;
+  }
+  #mobileHeader .brand-title{ font-size:14.5px; font-weight:700; }
+  #mobileHeader .streak-chip{ font-size:11px; }
+
+  /* Sidebar */
+  #sidebar{
+    width:230px;
+    flex-shrink:0;
+    padding:28px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:26px;
+    border-right:1px solid var(--line);
+  }
+  .brand{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding:0 6px;
+  }
+  .brand-mark{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .brand-mark .glyph{
+    width:30px;height:30px;
+    border:1.5px solid var(--ink);
+    border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Zilla Slab',serif;
+    font-weight:700;
+    font-size:15px;
+    color:var(--ink);
+    background:var(--gold-soft);
+  }
+  .brand-title{ font-size:18px; font-weight:700; }
+  .brand-sub{ font-size:11.5px; color:var(--ink-soft); padding:0 6px; line-height:1.4; }
+
+  nav.tabs{ display:flex; flex-direction:column; gap:2px; }
+  .tab-btn{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px;
+    border:none; background:transparent;
+    border-radius:8px;
+    font-size:14px; font-weight:500;
+    color:var(--ink-soft);
+    text-align:left;
+  }
+  .tab-btn svg{ width:17px; height:17px; flex-shrink:0; }
+  .tab-btn{ position:relative; }
+  .tab-btn:hover{ background:var(--paper-alt); color:var(--ink); }
+  .tab-btn.active{ background:var(--ink); color:var(--paper); }
+  .tab-btn.active::before{
+    content:''; position:absolute; left:-18px; top:50%; transform:translateY(-50%);
+    width:3px; height:16px; background:var(--gold); border-radius:2px;
+  }
+  .tab-btn:focus-visible{ outline:2px solid var(--gold); outline-offset:1px; }
+
+  .sidebar-footer{
+    margin-top:auto;
+    font-size:11px;
+    color:var(--ink-soft);
+    padding:0 6px;
+    line-height:1.5;
+    border-top:1px solid var(--line-soft);
+    padding-top:14px;
+  }
+  .streak-chip{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:0 6px;
+    font-size:11.5px;
+    color:var(--gold);
+    font-weight:600;
+  }
+
+  /* Main */
+  #main{
+    flex:1;
+    padding:30px 34px 60px 58px;
+    min-width:0;
+    position:relative;
+    background-image:
+      repeating-linear-gradient(to bottom, transparent 0px, transparent 35px, rgba(27,42,74,0.045) 36px);
+  }
+  #main::before{
+    content:'';
+    position:absolute;
+    top:0; bottom:0; left:36px;
+    width:1px;
+    background:rgba(180,67,46,0.3);
+    pointer-events:none;
+  }
+  .page-anim{ animation:fadeUp .28s ease; }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+
+  .eyebrow{
+    font-size:11px; font-weight:700; letter-spacing:0.09em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:6px;
+  }
+  .page-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    margin-bottom:22px;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .page-head h1{ font-size:26px; margin:0 0 4px; }
+  .page-head .sub{ color:var(--ink-soft); font-size:13.5px; }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line-soft);
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:var(--shadow);
+  }
+  .grid{ display:grid; gap:16px; }
+  .grid-2{ grid-template-columns:1.3fr 1fr; }
+  .grid-3{ grid-template-columns:repeat(3,1fr); }
+  @media (max-width:1000px){ .grid-3{ grid-template-columns:repeat(3,1fr); gap:12px; } }
+  @media (max-width:900px){ .grid-2{ grid-template-columns:1fr; } }
+  @media (max-width:640px){ .grid-3{ grid-template-columns:1fr; } }
+
+  .card h2{ font-size:16px; margin:0 0 14px; display:flex; align-items:center; justify-content:space-between; }
+  .card h2 .hint{ font-size:11.5px; font-weight:400; color:var(--ink-soft); font-family:'Inter'; }
+
+  /* date nav */
+  .date-nav{ display:flex; align-items:center; gap:10px; }
+  .date-nav button{
+    width:30px;height:30px; border-radius:50%;
+    border:1px solid var(--line); background:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ink);
+  }
+  .date-nav button:hover{ background:var(--gold-soft); border-color:var(--gold); }
+  .date-label{ font-family:'Zilla Slab',serif; font-weight:600; font-size:17px; min-width:230px; text-align:center; }
+  .today-btn{
+    font-size:11.5px; padding:5px 10px; border-radius:20px;
+    border:1px solid var(--ink); background:transparent; color:var(--ink); font-weight:600;
+  }
+  .today-btn:hover{ background:var(--ink); color:var(--paper); }
+
+  /* habit ledger rows */
+  .habit-row{
+    display:flex; align-items:center; gap:12px;
+    padding:11px 4px;
+    border-bottom:1px dashed var(--line);
+  }
+  .habit-row:last-child{ border-bottom:none; }
+  .tick{
+    width:23px;height:23px; border-radius:6px;
+    border:1.5px solid var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    background:var(--paper);
+  }
+  .tick.on{ background:var(--green); border-color:var(--green); color:var(--paper); }
+  .tick svg{ width:13px; height:13px; }
+  .habit-name{ flex:1; font-size:14px; }
+  .habit-remove{
+    background:none;border:none;color:var(--ink-soft); opacity:0.5; font-size:15px; padding:2px 4px;
+  }
+  .habit-remove:hover{ opacity:1; color:var(--rust); }
+
+  .add-habit-row{ display:flex; gap:8px; margin-top:12px; }
+  .add-habit-row input{ flex:1; }
+
+  input[type=text], input[type=number], select, textarea{
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:var(--paper);
+    color:var(--ink);
+    font-size:13.5px;
+  }
+  input:focus, select:focus, textarea:focus{ outline:2px solid var(--gold); outline-offset:0; border-color:var(--gold); }
+  textarea{ width:100%; resize:vertical; min-height:64px; }
+
+  .btn{
+    padding:9px 15px; border-radius:7px; border:1px solid var(--ink);
+    background:var(--ink); color:var(--paper); font-size:13px; font-weight:600;
+    transition:background .15s ease, transform .08s ease;
+  }
+  .btn:hover{ background:var(--charcoal); }
+  .btn:active{ transform:scale(0.97); }
+  .btn.ghost{ background:transparent; color:var(--ink); }
+  .btn.ghost:hover{ background:var(--paper-alt); }
+  .btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .tab-btn, .tick, .today-btn, .date-nav button, .mood-opt, .type-toggle button, .ledger-row{
+    transition:background .15s ease, color .15s ease, border-color .15s ease, transform .08s ease;
+  }
+  .tick:active, .mood-opt:active, .type-toggle button:active, .date-nav button:active{ transform:scale(0.94); }
+
+  .mood-row{ display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .mood-opt{
+    padding:7px 12px; border-radius:20px; border:1px solid var(--line);
+    background:var(--paper); font-size:12.5px; color:var(--ink-soft);
+  }
+  .mood-opt.sel{ background:var(--gold); border-color:var(--gold); color:var(--ink); font-weight:600; }
+
+  /* ring */
+  .ring-wrap{ display:flex; align-items:center; gap:16px; }
+  .ring-num{ font-family:'Zilla Slab',serif; font-size:26px; font-weight:700; }
+  .ring-label{ font-size:12px; color:var(--ink-soft); }
+  .net-amount{ font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:600; }
+  .net-amount.pos{ color:var(--green); }
+  .net-amount.neg{ color:var(--rust); }
+
+  /* transactions */
+  .tx-form{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .tx-form select, .tx-form input{ flex:1; min-width:100px; }
+  .type-toggle{ display:flex; border:1px solid var(--line); border-radius:7px; overflow:hidden; }
+  .type-toggle button{ padding:8px 12px; border:none; background:var(--paper); font-size:12.5px; color:var(--ink-soft); font-weight:600; }
+  .type-toggle button.sel.income{ background:var(--green-soft); color:var(--green); }
+  .type-toggle button.sel.expense{ background:var(--rust-soft); color:var(--rust); }
+
+  .tx-list{ display:flex; flex-direction:column; }
+  .tx-item{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 2px; border-bottom:1px dashed var(--line);
+    font-size:13px;
+  }
+  .tx-item:last-child{ border-bottom:none; }
+  .tx-cat{ font-weight:600; }
+  .tx-note{ color:var(--ink-soft); font-size:12px; flex:1; }
+  .tx-amt{ font-family:'IBM Plex Mono',monospace; font-weight:600; }
+  .tx-amt.income{ color:var(--green); }
+  .tx-amt.expense{ color:var(--rust); }
+  .tx-del{ background:none;border:none;color:var(--ink-soft); opacity:0.4; }
+  .tx-del:hover{ opacity:1; color:var(--rust); }
+  .empty-note{ color:var(--ink-soft); font-size:13px; font-style:italic; padding:8px 2px; }
+
+  /* month nav reuse date-nav */
+
+  .stat-card{ text-align:left; }
+  .stat-card .stat-label{ font-size:11.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px; }
+  .stat-card .stat-value{ font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:600; }
+
+  .cat-bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:9px; font-size:12.5px; }
+  .cat-bar-name{ width:120px; flex-shrink:0; color:var(--ink-soft); }
+  .cat-bar-track{ flex:1; height:8px; background:var(--paper-alt); border-radius:6px; overflow:hidden; }
+  .cat-bar-fill{ height:100%; background:var(--gold); border-radius:6px; }
+  .cat-bar-amt{ width:80px; text-align:right; font-family:'IBM Plex Mono',monospace; }
+
+  /* ledger rows (history) */
+  .ledger-book{ border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .ledger-header-row, .ledger-row{
+    display:grid; grid-template-columns: 110px 1fr 90px 110px;
+    gap:10px; padding:10px 14px; align-items:center;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .ledger-header-row{ background:var(--paper-alt); font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); font-weight:600; }
+  .ledger-row{ background:var(--card); font-size:13px; cursor:pointer; }
+  .ledger-row:hover{ background:var(--gold-soft); }
+  .ledger-row:last-child{ border-bottom:none; }
+  .ledger-date{ font-family:'IBM Plex Mono',monospace; font-size:12px; }
+  .ledger-dots{ display:flex; gap:4px; flex-wrap:wrap; }
+  .dot{ width:8px;height:8px;border-radius:50%; background:var(--line); }
+  .dot.on{ background:var(--green); }
+  .ledger-net{ font-family:'IBM Plex Mono',monospace; text-align:right; font-weight:600; }
+
+  .chart-wrap{ overflow-x:auto; }
+
+  .empty-state{
+    text-align:center; padding:40px 20px; color:var(--ink-soft);
+  }
+  .empty-state .glyph-lg{ font-size:32px; margin-bottom:10px; }
+
+  /* mobile */
+  @media (max-width:760px){
+    #app{ flex-direction:column; }
+    #mobileHeader{ display:flex; }
+
+    #sidebar{
+      position:fixed; left:0; right:0; bottom:0; z-index:30;
+      width:100%; flex-direction:row; align-items:stretch; gap:0;
+      padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+      border-right:none; border-top:1px solid var(--line);
+      background:var(--card);
+      box-shadow:0 -4px 16px rgba(27,42,74,0.08);
+    }
+    .brand{ display:none; }
+    nav.tabs{ flex-direction:row; flex:1; gap:2px; }
+    .tab-btn{
+      flex-direction:column; flex:1; gap:3px; align-items:center;
+      padding:7px 4px; font-size:10.5px; border-radius:10px;
+    }
+    .tab-btn svg{ width:19px; height:19px; }
+    .tab-btn.active::before{ display:none; }
+    .sidebar-footer{ display:none; }
+
+    #main{
+      padding:18px 16px calc(84px + env(safe-area-inset-bottom));
+    }
+    #main::before{ left:10px; }
+
+    .page-head{ align-items:flex-start; }
+    .page-head h1{ font-size:21px; }
+    .date-nav{ width:100%; justify-content:space-between; }
+    .date-label{ min-width:0; font-size:14px; flex:1; }
+
+    .ledger-header-row,.ledger-row{ grid-template-columns:78px 1fr; }
+    .ledger-header-row span:nth-child(2), .ledger-header-row span:nth-child(3),
+    .ledger-row .ledger-dots, .ledger-row span:nth-child(3){ display:none; }
+
+    .tx-form{ flex-direction:column; }
+    .tx-form select, .tx-form input, .tx-form .type-toggle{ width:100%; }
+    .type-toggle button{ flex:1; }
+  }
+</style>
+</head>
+<body>
+<div id="mobileHeader">
+  <div class="brand-mark">
+    <div class="glyph">ST</div>
+    <div class="brand-title">The Daily Ledger</div>
+  </div>
+  <div class="streak-chip" id="mobileStreak"></div>
+</div>
+<div id="app">
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <div class="glyph">ST</div>
+        <div class="brand-title">The Daily Ledger</div>
+      </div>
+      <div class="brand-sub">Shashank Tiwari · age 20<br>Growth &amp; money, tracked day by day.</div>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="sidebar-footer" id="sidebarFooter"></div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- storage helpers ---------- */
+  async function sGet(key, shared=false){
+    try{ const r = await window.storage.get(key, shared); return r ? r.value : null; }
+    catch(e){ return null; }
+  }
+  async function sSet(key, value, shared=false){
+    try{ await window.storage.set(key, value, shared); return true; }
+    catch(e){ console.error('storage set failed', e); return false; }
+  }
+  async function sList(prefix, shared=false){
+    try{ const r = await window.storage.list(prefix, shared); return r ? r.keys : []; }
+    catch(e){ return []; }
+  }
+
+  /* ---------- constants ---------- */
+  const DEFAULT_HABITS = ["Wake up before 7 AM","Exercise / workout","Read 20 minutes","Study or build a skill","Eat clean, no junk","Meditate 10 minutes","No phone 30 min before bed"];
+  const EXPENSE_CATS = ["Food","Transport","Education","Entertainment","Subscriptions","Savings / Investment","Other"];
+  const INCOME_CATS = ["Allowance","Freelance","Salary","Gift","Other"];
+  const MOODS = ["Low","Okay","Good","Great","On fire"];
+
+  const todayStr = () => new Date().toLocaleDateString('sv-SE');
+  const fmtINR = n => '₹' + Number(n||0).toLocaleString('en-IN');
+  const fmtDateLong = ds => {
+    const d = new Date(ds+'T00:00:00');
+    return d.toLocaleDateString('en-IN', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  };
+  const addDays = (ds, n) => {
+    const d = new Date(ds+'T00:00:00');
+    d.setDate(d.getDate()+n);
+    return d.toLocaleDateString('sv-SE');
+  };
+  const monthLabel = ym => {
+    const [y,m] = ym.split('-').map(Number);
+    return new Date(y, m-1, 1).toLocaleDateString('en-IN', { month:'long', year:'numeric' });
+  };
+  const shiftMonth = (ym, n) => {
+    const [y,m] = ym.split('-').map(Number);
+    const d = new Date(y, m-1+n, 1);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  };
+  const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+  function emptyDay(){ return { habits:{}, mood:null, note:'', transactions:[] }; }
+  function isDayActive(day){
+    if(!day) return false;
+    if(Object.values(day.habits||{}).some(Boolean)) return true;
+    if(day.transactions && day.transactions.length) return true;
+    if(day.note && day.note.trim()) return true;
+    return false;
+  }
+  function dayNet(day){
+    if(!day || !day.transactions) return 0;
+    return day.transactions.reduce((s,t)=> s + (t.type==='income'? t.amount : -t.amount), 0);
+  }
+
+  /* ---------- state ---------- */
+  const state = {
+    tab: 'today',
+    selectedDate: todayStr(),
+    habits: [],
+    dayCache: {},
+    allDaysMap: {},
+    allDaysLoaded: false,
+    financeMonth: todayStr().slice(0,7),
+    txType: 'expense',
+    showHabitEditor: false,
+  };
+
+  async function loadDay(ds){
+    if(state.dayCache[ds]) return state.dayCache[ds];
+    const raw = await sGet('day:'+ds);
+    const data = raw ? JSON.parse(raw) : emptyDay();
+    state.dayCache[ds] = data;
+    return data;
+  }
+  async function persistDay(ds){
+    await sSet('day:'+ds, JSON.stringify(state.dayCache[ds]));
+    state.allDaysMap[ds] = state.dayCache[ds];
+  }
+  async function loadAllDays(){
+    const keys = await sList('day:');
+    const map = {};
+    for(const k of keys){
+      const raw = await sGet(k);
+      if(raw){ map[k.slice(4)] = JSON.parse(raw); }
+    }
+    state.allDaysMap = Object.assign(map, state.allDaysMap);
+    state.allDaysLoaded = true;
+  }
+
+  /* ---------- icons ---------- */
+  const ICONS = {
+    today: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14l2 2 4-4" /></svg>',
+    finance: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5 1 2.5 2c0 2.5-5 1.7-5 4.2 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg>',
+    history: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="17" rx="1.5"/><path d="M4 9h16M9 4v-1M15 4v-1"/><path d="M8 13h3M8 17h6"/></svg>',
+    insights: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M11 20V4M18 20v-7"/></svg>',
+    chevL: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>',
+    chevR: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg>',
+  };
+
+  /* ---------- render root ---------- */
+  function renderNav(){
+    const tabsEl = document.getElementById('tabs');
+    const items = [
+      {id:'today', label:'Today', icon:ICONS.today},
+      {id:'finance', label:'Finance', icon:ICONS.finance},
+      {id:'history', label:'History', icon:ICONS.history},
+      {id:'insights', label:'Insights', icon:ICONS.insights},
+    ];
+    tabsEl.innerHTML = items.map(it => `
+      <button class="tab-btn ${state.tab===it.id?'active':''}" data-tab="${it.id}">${it.icon}<span>${it.label}</span></button>
+    `).join('');
+    tabsEl.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
+    });
+
+    const streak = computeStreak();
+    document.getElementById('sidebarFooter').innerHTML = `
+      <div class="streak-chip">🔥 ${streak}-day streak</div><br>
+      Every entry is saved automatically, day by day.
+    `;
+    const mobileStreak = document.getElementById('mobileStreak');
+    if(mobileStreak) mobileStreak.textContent = `🔥 ${streak}`;
+  }
+
+  async function switchTab(tab){
+    state.tab = tab;
+    if((tab==='finance' || tab==='history' || tab==='insights') && !state.allDaysLoaded){
+      await loadAllDays();
+    }
+    render();
+  }
+
+  async function render(){
+    renderNav();
+    const main = document.getElementById('main');
+    let content = '';
+    if(state.tab==='today') content = await renderToday();
+    else if(state.tab==='finance') content = renderFinance();
+    else if(state.tab==='history') content = renderHistory();
+    else if(state.tab==='insights') content = renderInsights();
+    main.innerHTML = `<div class="page-anim">${content}</div>`;
+    bindTabEvents();
+  }
+
+  /* ---------- TODAY TAB ---------- */
+  async function renderToday(){
+    const ds = state.selectedDate;
+    const day = await loadDay(ds);
+    const completed = state.habits.filter(h=>day.habits[h]).length;
+    const total = state.habits.length || 1;
+    const pct = Math.round((completed/total)*100);
+    const circumference = 2*Math.PI*26;
+    const dash = (pct/100)*circumference;
+    const net = dayNet(day);
+
+    const habitRows = state.habits.map(h => `
+      <div class="habit-row">
+        <button class="tick ${day.habits[h]?'on':''}" data-action="toggle-habit" data-habit="${escapeAttr(h)}">${day.habits[h]?ICONS.check:''}</button>
+        <div class="habit-name">${escapeHtml(h)}</div>
+        ${state.showHabitEditor? `<button class="habit-remove" data-action="remove-habit" data-habit="${escapeAttr(h)}">✕</button>`:''}
+      </div>
+    `).join('') || '<div class="empty-note">No habits yet — add your first one below.</div>';
+
+    const moodRow = MOODS.map(m => `<button class="mood-opt ${day.mood===m?'sel':''}" data-action="set-mood" data-mood="${m}">${m}</button>`).join('');
+
+    const txRows = (day.transactions||[]).length ? day.transactions.map(t => `
+      <div class="tx-item">
+        <span class="tx-cat">${escapeHtml(t.category)}</span>
+        <span class="tx-note">${escapeHtml(t.note||'')}</span>
+        <span class="tx-amt ${t.type}">${t.type==='income'?'+':'-'}${fmtINR(t.amount)}</span>
+        <button class="tx-del" data-action="del-tx" data-id="${t.id}">✕</button>
+      </div>
+    `).join('') : '<div class="empty-note">No transactions logged for this day yet.</div>';
+
+    const catOptions = (state.txType==='income'?INCOME_CATS:EXPENSE_CATS).map(c=>`<option value="${c}">${c}</option>`).join('');
+
+    return `
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Entry · ${ds}</div>
+          <h1>Today's page</h1>
+          <div class="sub">One page, every day — habits, mood and money in one place.</div>
+        </div>
+        <div class="date-nav">
+          <button data-action="prev-day">${ICONS.chevL}</button>
+          <div class="date-label">${fmtDateLong(ds)}</div>
+          <button data-action="next-day">${ICONS.chevR}</button>
+          ${ds!==todayStr() ? `<button class="today-btn" data-action="goto-today">Today</button>` : ''}
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Growth habits <span class="hint">${completed}/${state.habits.length} done</span></h2>
+          ${habitRows}
+          ${state.showHabitEditor ? `
+            <div class="add-habit-row">
+              <input type="text" id="newHabitInput" placeholder="Add a habit, e.g. Cold shower">
+              <button class="btn" data-action="add-habit">Add</button>
+            </div>
+          `:''}
+          <div style="margin-top:12px;">
+            <button class="btn ghost" data-action="toggle-editor">${state.showHabitEditor? 'Done editing' : 'Edit habit list'}</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Day summary</h2>
+          <div class="ring-wrap" style="margin-bottom:18px;">
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--line-soft)" stroke-width="7"/>
+              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--gold)" stroke-width="7"
+                stroke-dasharray="${dash} ${circumference}" stroke-linecap="round"
+                transform="rotate(-90 32 32)"/>
+            </svg>
+            <div>
+              <div class="ring-num">${pct}%</div>
+              <div class="ring-label">habits completed</div>
+            </div>
+          </div>
+          <div>
+            <div class="ring-label" style="margin-bottom:2px;">Net for the day</div>
+            <div class="net-amount ${net>=0?'pos':'neg'}">${net>=0?'+':'-'}${fmtINR(Math.abs(net))}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:18px;">
+        <div class="card">
+          <h2>Money log</h2>
+          <div class="tx-form">
+            <div class="type-toggle">
+              <button class="${state.txType==='expense'?'sel expense':''}" data-action="set-txtype" data-type="expense">Expense</button>
+              <button class="${state.txType==='income'?'sel income':''}" data-action="set-txtype" data-type="income">Income</button>
+            </div>
+            <select id="txCategory">${catOptions}</select>
+            <input type="number" id="txAmount" placeholder="Amount ₹" min="0" step="1">
+            <input type="text" id="txNote" placeholder="Note (optional)">
+            <button class="btn" data-action="add-tx">Add</button>
+          </div>
+          <div class="tx-list">${txRows}</div>
+        </div>
+
+        <div class="card">
+          <h2>Mood &amp; notes</h2>
+          <div class="mood-row">${moodRow}</div>
+          <textarea id="dayNote" placeholder="A line or two about today — what went well, what to fix tomorrow...">${escapeHtml(day.note||'')}</textarea>
+          <div style="margin-top:10px; text-align:right;">
+            <button class="btn ghost" data-action="save-note">Save note</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ---------- FINANCE TAB ---------- */
+  function renderFinance(){
+    const ym = state.financeMonth;
+    const daysInMonth = Object.keys(state.allDaysMap).filter(d=>d.startsWith(ym));
+    let income=0, expense=0;
+    const catTotals = {};
+    const txByDate = [];
+    daysInMonth.sort().forEach(ds=>{
+      const day = state.allDaysMap[ds];
+      (day.transactions||[]).forEach(t=>{
+        if(t.type==='income') income += t.amount; else expense += t.amount;
+        if(t.type==='expense'){ catTotals[t.category] = (catTotals[t.category]||0) + t.amount; }
+        txByDate.push({ds, ...t});
+      });
+    });
+    const net = income - expense;
+    const maxCat = Math.max(1, ...Object.values(catTotals));
+    const catRows = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>`
+      <div class="cat-bar-row">
+        <div class="cat-bar-name">${cat}</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${(amt/maxCat)*100}%"></div></div>
+        <div class="cat-bar-amt">${fmtINR(amt)}</div>
+      </div>
+    `).join('') || '<div class="empty-note">No expenses logged this month yet.</div>';
+
+    const txRows = txByDate.sort((a,b)=> a.ds<b.ds?1:-1).map(t=>`
+      <div class="tx-item">
+        <span class="ledger-date" style="width:80px;">${t.ds.slice(5)}</span>
+        <span class="tx-cat">${escapeHtml(t.category)}</span>
+        <span class="tx-note">${escapeHtml(t.note||'')}</span>
+        <span class="tx-amt ${t.type}">${t.type==='income'?'+':'-'}${fmtINR(t.amount)}</span>
+      </div>
+    `).join('') || '<div class="empty-note">Nothing recorded for this month.</div>';
+
+    return `
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Ledger · ${monthLabel(ym)}</div>
+          <h1>Finance ledger</h1>
+          <div class="sub">Income, spending and savings — one month at a time.</div>
+        </div>
+        <div class="date-nav">
+          <button data-action="prev-month">${ICONS.chevL}</button>
+          <div class="date-label">${monthLabel(ym)}</div>
+          <button data-action="next-month">${ICONS.chevR}</button>
+        </div>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="card stat-card"><div class="stat-label">Income</div><div class="stat-value" style="color:var(--green)">${fmtINR(income)}</div></div>
+        <div class="card stat-card"><div class="stat-label">Expense</div><div class="stat-value" style="color:var(--rust)">${fmtINR(expense)}</div></div>
+        <div class="card stat-card"><div class="stat-label">Net saved</div><div class="stat-value">${fmtINR(net)}</div></div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:18px;">
+        <div class="card">
+          <h2>Spending by category</h2>
+          ${catRows}
+        </div>
+        <div class="card">
+          <h2>All transactions <span class="hint">${txByDate.length} entries</span></h2>
+          <div class="tx-list" style="max-height:340px; overflow-y:auto;">${txRows}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ---------- HISTORY TAB ---------- */
+  function renderHistory(){
+    const dates = Object.keys(state.allDaysMap).sort((a,b)=> a<b?1:-1);
+    if(!dates.length){
+      return `
+        <div class="page-head"><div><div class="eyebrow">Archive</div><h1>History</h1><div class="sub">Every logged day, laid out like a ledger.</div></div></div>
+        <div class="card empty-state"><div class="glyph-lg">📖</div>No days logged yet. Head to Today and make your first entry.</div>
+      `;
+    }
+    const rows = dates.map(ds=>{
+      const day = state.allDaysMap[ds];
+      const net = dayNet(day);
+      const dots = state.habits.map(h=>`<span class="dot ${day.habits[h]?'on':''}"></span>`).join('');
+      return `
+        <div class="ledger-row" data-action="open-day" data-date="${ds}">
+          <span class="ledger-date">${ds}</span>
+          <span class="ledger-dots">${dots}</span>
+          <span>${state.habits.filter(h=>day.habits[h]).length}/${state.habits.length||0}</span>
+          <span class="ledger-net" style="color:${net>=0?'var(--green)':'var(--rust)'}">${net>=0?'+':'-'}${fmtINR(Math.abs(net))}</span>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="page-head"><div><div class="eyebrow">Archive · ${dates.length} days</div><h1>History</h1><div class="sub">Every logged day, laid out like a ledger. Tap a row to open it.</div></div></div>
+      <div class="ledger-book">
+        <div class="ledger-header-row"><span>Date</span><span>Habits</span><span>Done</span><span style="text-align:right;">Net</span></div>
+        ${rows}
+      </div>
+    `;
+  }
+
+  /* ---------- INSIGHTS TAB ---------- */
+  function renderInsights(){
+    const dates = Object.keys(state.allDaysMap);
+    const activeDates = dates.filter(d=>isDayActive(state.allDaysMap[d]));
+    const totalDays = activeDates.length;
+    const streak = computeStreak();
+    const best = computeBestStreak();
+
+    let allExpense=0, allIncome=0, totalTicks=0, possibleTicks=0;
+    dates.forEach(ds=>{
+      const day = state.allDaysMap[ds];
+      (day.transactions||[]).forEach(t=>{ if(t.type==='income') allIncome+=t.amount; else allExpense+=t.amount; });
+      totalTicks += Object.values(day.habits||{}).filter(Boolean).length;
+      possibleTicks += state.habits.length;
+    });
+    const completionRate = possibleTicks ? Math.round((totalTicks/possibleTicks)*100) : 0;
+
+    const last14 = [];
+    for(let i=13;i>=0;i--){ last14.push(addDays(todayStr(), -i)); }
+    const nets = last14.map(ds=> dayNet(state.allDaysMap[ds]||emptyDay()));
+    const maxAbs = Math.max(1, ...nets.map(n=>Math.abs(n)));
+    const barW = 26, gap=8, chartH=110;
+    const bars = nets.map((n,i)=>{
+      const h = Math.max(2, (Math.abs(n)/maxAbs)*(chartH/2-6));
+      const x = i*(barW+gap);
+      const isPos = n>=0;
+      const y = isPos ? (chartH/2 - h) : chartH/2;
+      return `<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="3" fill="${isPos?'var(--green)':'var(--rust)'}"/>
+              <text x="${x+barW/2}" y="${chartH+14}" font-size="9" fill="var(--ink-soft)" text-anchor="middle" font-family="IBM Plex Mono">${last14[i].slice(8)}</text>`;
+    }).join('');
+    const chartWidth = last14.length*(barW+gap);
+
+    return `
+      <div class="page-head"><div><div class="eyebrow">Overview</div><h1>Insights</h1><div class="sub">The bigger picture — momentum and money over time.</div></div></div>
+
+      <div class="grid grid-3">
+        <div class="card stat-card"><div class="stat-label">Current streak</div><div class="stat-value" style="color:var(--gold)">${streak} days</div></div>
+        <div class="card stat-card"><div class="stat-label">Best streak</div><div class="stat-value">${best} days</div></div>
+        <div class="card stat-card"><div class="stat-label">Days logged</div><div class="stat-value">${totalDays}</div></div>
+      </div>
+      <div class="grid grid-3" style="margin-top:18px;">
+        <div class="card stat-card"><div class="stat-label">Habit completion rate</div><div class="stat-value">${completionRate}%</div></div>
+        <div class="card stat-card"><div class="stat-label">All-time saved</div><div class="stat-value" style="color:${(allIncome-allExpense)>=0?'var(--green)':'var(--rust)'}">${fmtINR(allIncome-allExpense)}</div></div>
+        <div class="card stat-card"><div class="stat-label">All-time spent</div><div class="stat-value" style="color:var(--rust)">${fmtINR(allExpense)}</div></div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <h2>Last 14 days — net amount</h2>
+        <div class="chart-wrap">
+          <svg width="${chartWidth}" height="${chartH+24}" viewBox="0 0 ${chartWidth} ${chartH+24}">
+            <line x1="0" y1="${chartH/2}" x2="${chartWidth}" y2="${chartH/2}" stroke="var(--line)" stroke-width="1"/>
+            ${bars}
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+
+  function computeStreak(){
+    let streak = 0;
+    let d = todayStr();
+    while(true){
+      const day = state.allDaysMap[d] || state.dayCache[d];
+      if(day && isDayActive(day)){ streak++; d = addDays(d,-1); }
+      else break;
+    }
+    return streak;
+  }
+  function computeBestStreak(){
+    const dates = Object.keys(state.allDaysMap).filter(d=>isDayActive(state.allDaysMap[d])).sort();
+    let best=0, run=0, prev=null;
+    dates.forEach(ds=>{
+      if(prev && addDays(prev,1)===ds){ run++; } else { run=1; }
+      best = Math.max(best, run);
+      prev = ds;
+    });
+    return best;
+  }
+
+  /* ---------- events ---------- */
+  function bindTabEvents(){
+    const main = document.getElementById('main');
+    if(!main.dataset.bound){
+      main.addEventListener('click', onMainClick);
+      main.dataset.bound = '1';
+    }
+  }
+
+  async function onMainClick(e){
+    const el = e.target.closest('[data-action]');
+    if(!el) return;
+    const action = el.dataset.action;
+    const ds = state.selectedDate;
+
+    if(action==='prev-day'){ state.selectedDate = addDays(ds,-1); return render(); }
+    if(action==='next-day'){ state.selectedDate = addDays(ds,1); return render(); }
+    if(action==='goto-today'){ state.selectedDate = todayStr(); return render(); }
+
+    if(action==='toggle-habit'){
+      const h = el.dataset.habit;
+      const day = await loadDay(ds);
+      day.habits[h] = !day.habits[h];
+      await persistDay(ds);
+      return render();
+    }
+    if(action==='toggle-editor'){ state.showHabitEditor = !state.showHabitEditor; return render(); }
+    if(action==='add-habit'){
+      const input = document.getElementById('newHabitInput');
+      const val = input.value.trim();
+      if(val && !state.habits.includes(val)){
+        state.habits.push(val);
+        await sSet('config:habits', JSON.stringify(state.habits));
+      }
+      return render();
+    }
+    if(action==='remove-habit'){
+      const h = el.dataset.habit;
+      state.habits = state.habits.filter(x=>x!==h);
+      await sSet('config:habits', JSON.stringify(state.habits));
+      return render();
+    }
+    if(action==='set-mood'){
+      const day = await loadDay(ds);
+      day.mood = el.dataset.mood;
+      await persistDay(ds);
+      return render();
+    }
+    if(action==='save-note'){
+      const day = await loadDay(ds);
+      day.note = document.getElementById('dayNote').value;
+      await persistDay(ds);
+      return render();
+    }
+    if(action==='set-txtype'){ state.txType = el.dataset.type; return render(); }
+    if(action==='add-tx'){
+      const cat = document.getElementById('txCategory').value;
+      const amtRaw = document.getElementById('txAmount').value;
+      const note = document.getElementById('txNote').value.trim();
+      const amt = Number(amtRaw);
+      if(!amt || amt<=0) return;
+      const day = await loadDay(ds);
+      day.transactions = day.transactions || [];
+      day.transactions.push({ id: uid(), type: state.txType, category: cat, amount: amt, note });
+      await persistDay(ds);
+      return render();
+    }
+    if(action==='del-tx'){
+      const day = await loadDay(ds);
+      day.transactions = (day.transactions||[]).filter(t=>t.id!==el.dataset.id);
+      await persistDay(ds);
+      return render();
+    }
+    if(action==='prev-month'){ state.financeMonth = shiftMonth(state.financeMonth,-1); return render(); }
+    if(action==='next-month'){ state.financeMonth = shiftMonth(state.financeMonth,1); return render(); }
+    if(action==='open-day'){
+      state.selectedDate = el.dataset.date;
+      state.tab = 'today';
+      return render();
+    }
+  }
+
+  function escapeHtml(s){
+    return String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function escapeAttr(s){ return escapeHtml(s); }
+
+  /* ---------- init ---------- */
+  async function init(){
+    const raw = await sGet('config:habits');
+    if(raw){ state.habits = JSON.parse(raw); }
+    else { state.habits = DEFAULT_HABITS.slice(); await sSet('config:habits', JSON.stringify(state.habits)); }
+    await loadDay(state.selectedDate);
+    render();
+  }
+  init();
+})();
+</script>
+</body>
+</html>
