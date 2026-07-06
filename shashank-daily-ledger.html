@@ -408,16 +408,48 @@
 
   /* ---------- storage helpers ---------- */
   async function sGet(key, shared=false){
-    try{ const r = await window.storage.get(key, shared); return r ? r.value : null; }
-    catch(e){ return null; }
+    try{
+      if (window.storage && typeof window.storage.get === 'function') {
+        const r = await window.storage.get(key, shared);
+        return r ? r.value : null;
+      }
+    } catch(e) {}
+    try {
+      const res = await fetch(`/api/storage?key=${encodeURIComponent(key)}`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.value;
+    } catch(e) { return null; }
   }
   async function sSet(key, value, shared=false){
-    try{ await window.storage.set(key, value, shared); return true; }
-    catch(e){ console.error('storage set failed', e); return false; }
+    try{
+      if (window.storage && typeof window.storage.set === 'function') {
+        await window.storage.set(key, value, shared);
+        return true;
+      }
+    } catch(e) {}
+    try {
+      const res = await fetch('/api/storage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value })
+      });
+      return res.ok;
+    } catch(e) { console.error('storage set failed', e); return false; }
   }
   async function sList(prefix, shared=false){
-    try{ const r = await window.storage.list(prefix, shared); return r ? r.keys : []; }
-    catch(e){ return []; }
+    try{
+      if (window.storage && typeof window.storage.list === 'function') {
+        const r = await window.storage.list(prefix, shared);
+        return r ? r.keys : [];
+      }
+    } catch(e) {}
+    try {
+      const res = await fetch(`/api/storage/list?prefix=${encodeURIComponent(prefix)}`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.keys || [];
+    } catch(e) { return []; }
   }
 
   /* ---------- constants ---------- */
