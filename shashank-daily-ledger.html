@@ -522,7 +522,7 @@
       -webkit-backdrop-filter: blur(16px);
       box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
     }
-    .brand, .theme-store, .theme-toggle-wrap { display: none; }
+    .brand, .theme-trigger-btn, .theme-toggle-wrap { display: none; }
     nav.tabs { flex-direction: row; flex: 1; gap: 2px; }
     .tab-btn {
       flex-direction: column; flex: 1; gap: 3px; align-items: center;
@@ -619,25 +619,74 @@
     .ledger-header-row, .ledger-row { grid-template-columns: 70px 1fr 45px 70px; gap: 4px; padding: 8px 8px; font-size: 11px; }
   }
 
-  /* ===== THEME STORE ===== */
-  .theme-store { display: flex; flex-direction: column; gap: 4px; }
-  .theme-store-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: 4px; }
+  /* ===== THEME STORE POPUP ===== */
+  .theme-trigger-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 12px; border-radius: 8px;
+    border: 1.5px solid var(--border-color);
+    background: var(--card-bg); color: var(--text-primary);
+    font-size: 12px; font-weight: 600;
+    transition: all 0.2s ease;
+    width: 100%;
+    cursor: pointer;
+  }
+  .theme-trigger-btn:hover {
+    background: var(--accent-soft); border-color: var(--accent); transform: translateY(-1px);
+  }
+  .theme-popup-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
+  }
+  .theme-popup-backdrop.open { display: flex; align-items: center; justify-content: center; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .theme-popup {
+    background: var(--bg-main);
+    border: 1.5px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px 24px 20px;
+    width: 340px; max-width: calc(100vw - 32px);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.05);
+    animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+  @keyframes popUp { from { opacity: 0; transform: scale(0.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .theme-popup-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .theme-popup-header h3 {
+    font-size: 16px; font-family: var(--font-heading); font-weight: 700; margin: 0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .theme-popup-close {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 1.5px solid var(--border-color);
+    background: var(--card-bg); color: var(--text-primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .theme-popup-close:hover { background: var(--rust-soft); border-color: var(--rust); color: var(--rust); transform: rotate(90deg); }
+  .theme-store-list { display: flex; flex-direction: column; gap: 6px; }
   .theme-swatch {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 10px; border-radius: 8px;
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 10px;
     border: 1.5px solid var(--border-color);
     cursor: pointer;
-    font-size: 12px; font-weight: 600;
+    font-size: 13px; font-weight: 600;
     transition: all 0.2s ease;
     background: var(--card-bg);
     color: var(--text-primary);
   }
-  .theme-swatch:hover:not(.locked) { border-color: var(--accent); background: var(--accent-soft); transform: translateX(2px); }
-  .theme-swatch.active { border-color: var(--accent); background: var(--accent-soft); }
+  .theme-swatch:hover:not(.locked) { border-color: var(--accent); background: var(--accent-soft); transform: translateX(3px); }
+  .theme-swatch.active { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 2px var(--accent-soft); }
   .theme-swatch.locked { opacity: 0.5; cursor: not-allowed; }
-  .swatch-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .swatch-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.1); }
   .swatch-label { flex: 1; }
-  .swatch-badge { font-size: 10px; background: var(--accent-soft); color: var(--accent); padding: 2px 6px; border-radius: 10px; }
+  .swatch-badge { font-size: 10px; background: var(--accent-soft); color: var(--accent); padding: 3px 8px; border-radius: 10px; font-weight: 700; }
 
   /* ===== HEATMAP ===== */
   .heatmap-grid {
@@ -746,14 +795,21 @@
       </div>
       <div class="brand-sub">Shashank Tiwari · age 20<br>Growth &amp; money, tracked day by day.</div>
     </div>
-    <div class="theme-store">
-      <div class="theme-store-title">🎨 Theme Store</div>
-      <div id="themeStoreList"></div>
-    </div>
+    <button class="theme-trigger-btn" id="themeStoreToggle">🎨 Theme Store</button>
     <nav class="tabs" id="tabs"></nav>
     <div class="sidebar-footer" id="sidebarFooter"></div>
   </aside>
   <main id="main"></main>
+</div>
+
+<div class="theme-popup-backdrop" id="themePopupBackdrop">
+  <div class="theme-popup">
+    <div class="theme-popup-header">
+      <h3>🎨 Theme Store</h3>
+      <button class="theme-popup-close" id="themePopupClose">✕</button>
+    </div>
+    <div class="theme-store-list" id="themeStoreList"></div>
+  </div>
 </div>
 
 <script>
@@ -1532,7 +1588,14 @@
   }
   function escapeAttr(s){ return escapeHtml(s); }
 
-  /* ---------- THEME STORE ---------- */
+  /* ---------- THEME STORE POPUP ---------- */
+  function openThemePopup(){
+    document.getElementById('themePopupBackdrop').classList.add('open');
+  }
+  function closeThemePopup(){
+    document.getElementById('themePopupBackdrop').classList.remove('open');
+  }
+
   function renderThemeStore(){
     const streak = computeStreak();
     const current = document.documentElement.getAttribute('data-theme') || 'light';
@@ -1555,25 +1618,32 @@
         const id = el.dataset.themeId;
         document.documentElement.setAttribute('data-theme', id);
         localStorage.setItem('theme', id);
-        // update mobile btn icon
         const mobileBtn = document.getElementById('mobileThemeToggle');
         if(mobileBtn) mobileBtn.textContent = ['light'].includes(id) ? '🌙' : '☀️';
         renderThemeStore();
       });
     });
 
-    // mobile cycle button
+    // sidebar trigger
+    const triggerBtn = document.getElementById('themeStoreToggle');
+    if(triggerBtn) triggerBtn.onclick = openThemePopup;
+
+    // popup close
+    document.getElementById('themePopupClose').onclick = closeThemePopup;
+    document.getElementById('themePopupBackdrop').onclick = (e) => {
+      if(e.target === e.currentTarget) closeThemePopup();
+    };
+
+    // mobile button opens popup instead of cycling
     const mobileBtn = document.getElementById('mobileThemeToggle');
     if(mobileBtn){
-      mobileBtn.onclick = () => {
-        const ids = THEMES.filter(t => streak >= t.req).map(t => t.id);
-        const cur = document.documentElement.getAttribute('data-theme') || 'light';
-        const next = ids[(ids.indexOf(cur) + 1) % ids.length];
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        renderThemeStore();
-      };
+      mobileBtn.onclick = openThemePopup;
     }
+
+    // ESC key closes popup
+    document.onkeydown = (e) => {
+      if(e.key === 'Escape') closeThemePopup();
+    };
   }
 
   /* ---------- init ---------- */
