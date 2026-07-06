@@ -31,7 +31,6 @@
   }
 
   [data-theme="dark"] {
-    /* Deep Midnight Dark Theme */
     --bg-app: #0B0E14;
     --bg-main: #111520;
     --card-bg: rgba(20, 26, 38, 0.7);
@@ -48,6 +47,68 @@
     --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.2);
     --shadow-hover: 0 16px 36px -8px rgba(0, 0, 0, 0.5), 0 4px 14px rgba(0, 0, 0, 0.3);
   }
+
+  [data-theme="cyberpunk"] {
+    --bg-app: #06080F;
+    --bg-main: #0D0F1A;
+    --card-bg: rgba(15, 18, 35, 0.8);
+    --border-color: rgba(255, 0, 200, 0.15);
+    --border-hover: rgba(255, 0, 200, 0.4);
+    --text-primary: #F0E6FF;
+    --text-secondary: #9B7FCC;
+    --accent: #FF00C8;
+    --accent-soft: rgba(255, 0, 200, 0.12);
+    --green: #00FFAA;
+    --green-soft: rgba(0, 255, 170, 0.12);
+    --rust: #FF3864;
+    --rust-soft: rgba(255, 56, 100, 0.12);
+    --shadow: 0 0 20px rgba(255, 0, 200, 0.1), 0 10px 30px rgba(0,0,0,0.5);
+    --shadow-hover: 0 0 30px rgba(255, 0, 200, 0.2), 0 16px 40px rgba(0,0,0,0.6);
+  }
+
+  [data-theme="forest"] {
+    --bg-app: #060D08;
+    --bg-main: #0A1410;
+    --card-bg: rgba(10, 22, 14, 0.85);
+    --border-color: rgba(0, 255, 65, 0.1);
+    --border-hover: rgba(0, 255, 65, 0.3);
+    --text-primary: #B8FFCA;
+    --text-secondary: #5D9970;
+    --accent: #00FF41;
+    --accent-soft: rgba(0, 255, 65, 0.1);
+    --green: #00FF41;
+    --green-soft: rgba(0, 255, 65, 0.12);
+    --rust: #FF4040;
+    --rust-soft: rgba(255, 64, 64, 0.12);
+    --shadow: 0 0 20px rgba(0, 255, 65, 0.08), 0 10px 30px rgba(0,0,0,0.6);
+    --shadow-hover: 0 0 30px rgba(0, 255, 65, 0.15), 0 16px 40px rgba(0,0,0,0.7);
+  }
+
+  [data-theme="sunset"] {
+    --bg-app: #0F0808;
+    --bg-main: #180E0A;
+    --card-bg: rgba(28, 14, 8, 0.8);
+    --border-color: rgba(255, 140, 50, 0.15);
+    --border-hover: rgba(255, 140, 50, 0.35);
+    --text-primary: #FFE8D0;
+    --text-secondary: #B8835A;
+    --accent: #FF8C32;
+    --accent-soft: rgba(255, 140, 50, 0.14);
+    --green: #FFD700;
+    --green-soft: rgba(255, 215, 0, 0.12);
+    --rust: #FF4444;
+    --rust-soft: rgba(255, 68, 68, 0.12);
+    --shadow: 0 0 20px rgba(255, 100, 30, 0.1), 0 10px 30px rgba(0,0,0,0.5);
+    --shadow-hover: 0 0 30px rgba(255, 100, 30, 0.2), 0 16px 40px rgba(0,0,0,0.6);
+  }
+
+  /* Theme glow for special themes */
+  [data-theme="cyberpunk"] .card { box-shadow: 0 0 0 1px rgba(255,0,200,0.08), var(--shadow); }
+  [data-theme="cyberpunk"] .tab-btn.active { box-shadow: 0 0 12px rgba(255,0,200,0.3); }
+  [data-theme="forest"] .card { box-shadow: 0 0 0 1px rgba(0,255,65,0.06), var(--shadow); }
+  [data-theme="forest"] .tab-btn.active { box-shadow: 0 0 12px rgba(0,255,65,0.3); }
+  [data-theme="sunset"] .card { box-shadow: 0 0 0 1px rgba(255,140,50,0.1), var(--shadow); }
+  [data-theme="sunset"] .tab-btn.active { box-shadow: 0 0 12px rgba(255,140,50,0.3); }
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -456,6 +517,105 @@
     .tx-form select, .tx-form input, .tx-form .type-toggle { width: 100%; }
     .type-toggle button { flex: 1; }
   }
+
+  /* ---- Theme Store ---- */
+  .theme-store { display: flex; flex-direction: column; gap: 4px; }
+  .theme-store-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: 4px; }
+  .theme-swatch {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    border: 1.5px solid var(--border-color);
+    cursor: pointer;
+    font-size: 12px; font-weight: 600;
+    transition: all 0.2s ease;
+    background: var(--card-bg);
+    color: var(--text-primary);
+  }
+  .theme-swatch:hover:not(.locked) { border-color: var(--accent); background: var(--accent-soft); transform: translateX(2px); }
+  .theme-swatch.active { border-color: var(--accent); background: var(--accent-soft); }
+  .theme-swatch.locked { opacity: 0.5; cursor: not-allowed; }
+  .swatch-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .swatch-label { flex: 1; }
+  .swatch-badge { font-size: 10px; background: var(--accent-soft); color: var(--accent); padding: 2px 6px; border-radius: 10px; }
+
+  /* ---- Heatmap ---- */
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 5px;
+    margin-top: 12px;
+  }
+  .heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    cursor: default;
+    transition: transform 0.15s ease;
+    position: relative;
+  }
+  .heatmap-cell:hover { transform: scale(1.3); z-index: 1; }
+  .heatmap-cell .heatmap-tip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%; transform: translateX(-50%);
+    background: var(--text-primary);
+    color: var(--bg-main);
+    font-size: 10px;
+    padding: 3px 7px;
+    border-radius: 5px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .heatmap-cell:hover .heatmap-tip { display: block; }
+
+  /* ---- Race Track ---- */
+  .challenge-card { padding: 20px 24px; }
+  .challenge-list { display: flex; flex-direction: column; gap: 16px; }
+  .race-track-wrap { margin: 10px 0 4px; position: relative; }
+  .race-track {
+    height: 30px;
+    background: var(--border-color);
+    border-radius: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  .race-fill {
+    height: 100%;
+    border-radius: 30px;
+    background: linear-gradient(90deg, var(--green), var(--accent));
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .race-runner {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    font-size: 18px;
+    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    line-height: 1;
+  }
+  .race-trophy { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); font-size: 16px; }
+  .challenge-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 12px; color: var(--text-secondary); }
+  .challenge-done-btn {
+    font-size: 11px; padding: 4px 10px; border-radius: 20px;
+    border: 1.5px solid var(--green); color: var(--green);
+    background: var(--green-soft); font-weight: 700;
+    transition: all 0.2s ease;
+  }
+  .challenge-done-btn.completed { background: var(--green); color: #fff; }
+  .challenge-done-btn:hover:not(.completed) { background: var(--green); color: #fff; }
+  .challenge-del-btn { font-size: 11px; color: var(--rust); opacity: 0.5; }
+  .challenge-del-btn:hover { opacity: 1; }
+  .new-challenge-form { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border-color); }
+  .new-challenge-form input, .new-challenge-form select { flex: 1; min-width: 100px; }
+  .challenge-complete-banner {
+    text-align: center; padding: 10px;
+    background: linear-gradient(135deg, var(--green-soft), var(--accent-soft));
+    border-radius: 8px; font-size: 14px; font-weight: 700;
+    color: var(--text-primary);
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 </style>
 <script>
   (function() {
@@ -484,10 +644,9 @@
       </div>
       <div class="brand-sub">Shashank Tiwari · age 20<br>Growth &amp; money, tracked day by day.</div>
     </div>
-    <div class="theme-toggle-wrap">
-      <button class="theme-toggle-btn" id="sidebarThemeToggle" aria-label="Toggle Theme">
-        <span class="mode-icon">🌙</span> Dark Mode
-      </button>
+    <div class="theme-store">
+      <div class="theme-store-title">🎨 Theme Store</div>
+      <div id="themeStoreList"></div>
     </div>
     <nav class="tabs" id="tabs"></nav>
     <div class="sidebar-footer" id="sidebarFooter"></div>
@@ -628,6 +787,15 @@
     return day.transactions.reduce((s,t)=> s + (t.type==='income'? t.amount : -t.amount), 0);
   }
 
+  /* ---------- theme store config ---------- */
+  const THEMES = [
+    { id: 'light',    label: 'Vintage Cream',    dot: '#B8892B', req: 0 },
+    { id: 'dark',     label: 'Midnight Obsidian', dot: '#E5A93C', req: 0 },
+    { id: 'cyberpunk',label: 'Cyberpunk Neon',   dot: '#FF00C8', req: 3 },
+    { id: 'forest',   label: 'Forest Matrix',    dot: '#00FF41', req: 5 },
+    { id: 'sunset',   label: 'Sunset Gold',      dot: '#FF8C32', req: 7 },
+  ];
+
   /* ---------- state ---------- */
   const state = {
     tab: 'today',
@@ -639,6 +807,7 @@
     financeMonth: todayStr().slice(0,7),
     txType: 'expense',
     showHabitEditor: false,
+    challenges: [],
   };
 
   async function loadDay(ds){
@@ -719,6 +888,8 @@
     else if(state.tab==='insights') content = renderInsights();
     main.innerHTML = `<div class="page-anim">${content}</div>`;
     bindTabEvents();
+    renderThemeStore();
+    bindChallengeFormEvents();
   }
 
   /* ---------- TODAY TAB ---------- */
@@ -787,8 +958,8 @@
           <h2>Day summary</h2>
           <div class="ring-wrap" style="margin-bottom:18px;">
             <svg width="64" height="64" viewBox="0 0 64 64">
-              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--line-soft)" stroke-width="7"/>
-              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--gold)" stroke-width="7"
+              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border-color)" stroke-width="7"/>
+              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--accent)" stroke-width="7"
                 stroke-dasharray="${dash} ${circumference}" stroke-linecap="round"
                 transform="rotate(-90 32 32)"/>
             </svg>
@@ -803,6 +974,8 @@
           </div>
         </div>
       </div>
+
+      ${renderChallengeCard(ds)}
 
       <div class="grid grid-2" style="margin-top:18px;">
         <div class="card">
@@ -827,6 +1000,70 @@
           <div style="margin-top:10px; text-align:right;">
             <button class="btn ghost" data-action="save-note">Save note</button>
           </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ---------- CHALLENGE RACE TRACKS ---------- */
+  const CHALLENGE_TEMPLATES = [
+    { name: '7-Day Clean Eating', days: 7 },
+    { name: '14-Day Savings Sprint', days: 14 },
+    { name: '21-Day No Junk Food', days: 21 },
+    { name: '30-Day Morning Routine', days: 30 },
+    { name: '10-Day Workout Streak', days: 10 },
+    { name: 'Custom Challenge', days: 7, custom: true },
+  ];
+
+  function renderChallengeCard(todayDs){
+    const challengeItems = state.challenges.map((ch, idx) => {
+      const doneCount = (ch.completedDates||[]).length;
+      const pct = Math.min(100, Math.round((doneCount / ch.days) * 100));
+      const runnerLeft = Math.max(2, Math.min(88, (doneCount / ch.days) * 88));
+      const isDoneToday = (ch.completedDates||[]).includes(todayDs);
+      const isComplete = doneCount >= ch.days;
+      return `
+        <div style="border-bottom: 1px dashed var(--border-color); padding-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div style="font-size:14px; font-weight:700;">${escapeHtml(ch.name)}</div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              ${isComplete
+                ? `<div class="challenge-complete-banner">🏆 Challenge Complete!</div>`
+                : `<button class="challenge-done-btn ${isDoneToday?'completed':''}" data-action="challenge-tick" data-idx="${idx}">${isDoneToday ? '✓ Done today' : 'Mark today'}</button>`
+              }
+              <button class="challenge-del-btn" data-action="challenge-del" data-idx="${idx}">✕</button>
+            </div>
+          </div>
+          <div class="race-track-wrap">
+            <div class="race-track">
+              <div class="race-fill" style="width:${pct}%"></div>
+              <span class="race-runner" style="left:${runnerLeft}%">🏃</span>
+              <span class="race-trophy">🏆</span>
+            </div>
+          </div>
+          <div class="challenge-meta">
+            <span>${doneCount} / ${ch.days} days completed</span>
+            <span style="font-weight:600; color:var(--accent);">${pct}%</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const templateOptions = CHALLENGE_TEMPLATES.map(t =>
+      `<option value="${t.custom ? 'custom' : t.name}" data-days="${t.days}">${t.name}</option>`
+    ).join('');
+
+    return `
+      <div class="card challenge-card" style="margin-top:18px;">
+        <h2>🏃 Challenge Race Tracks <span class="hint">${state.challenges.length} active</span></h2>
+        <div class="challenge-list">
+          ${challengeItems || '<div class="empty-note">No active challenges yet. Start one below!</div>'}
+        </div>
+        <div class="new-challenge-form">
+          <select id="challengeTemplate">${templateOptions}</select>
+          <input type="text" id="challengeCustomName" placeholder="Custom name" style="display:none;">
+          <input type="number" id="challengeCustomDays" placeholder="Days" min="1" max="365" style="display:none; max-width:80px;">
+          <button class="btn" data-action="add-challenge">Start Challenge</button>
         </div>
       </div>
     `;
@@ -963,11 +1200,13 @@
     }).join('');
     const chartWidth = last14.length*(barW+gap);
 
+    const heatmapHtml = renderHeatmap();
+
     return `
       <div class="page-head"><div><div class="eyebrow">Overview</div><h1>Insights</h1><div class="sub">The bigger picture — momentum and money over time.</div></div></div>
 
       <div class="grid grid-3">
-        <div class="card stat-card"><div class="stat-label">Current streak</div><div class="stat-value" style="color:var(--gold)">${streak} days</div></div>
+        <div class="card stat-card"><div class="stat-label">Current streak</div><div class="stat-value" style="color:var(--accent)">${streak} days</div></div>
         <div class="card stat-card"><div class="stat-label">Best streak</div><div class="stat-value">${best} days</div></div>
         <div class="card stat-card"><div class="stat-label">Days logged</div><div class="stat-value">${totalDays}</div></div>
       </div>
@@ -978,15 +1217,54 @@
       </div>
 
       <div class="card" style="margin-top:18px;">
+        <h2>🟩 30-Day Habit Heatmap</h2>
+        ${heatmapHtml}
+        <div style="display:flex; gap:8px; align-items:center; margin-top:12px; font-size:11px; color:var(--text-secondary);">
+          <span>Less</span>
+          <div style="display:flex; gap:3px;">
+            ${[0,25,50,75,100].map(p => `<div style="width:12px;height:12px;border-radius:3px;background:${heatColor(p)}"></div>`).join('')}
+          </div>
+          <span>More</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
         <h2>Last 14 days — net amount</h2>
         <div class="chart-wrap">
           <svg width="${chartWidth}" height="${chartH+24}" viewBox="0 0 ${chartWidth} ${chartH+24}">
-            <line x1="0" y1="${chartH/2}" x2="${chartWidth}" y2="${chartH/2}" stroke="var(--line)" stroke-width="1"/>
+            <line x1="0" y1="${chartH/2}" x2="${chartWidth}" y2="${chartH/2}" stroke="var(--border-color)" stroke-width="1"/>
             ${bars}
           </svg>
         </div>
       </div>
     `;
+  }
+
+  /* ---------- HEATMAP ---------- */
+  function heatColor(pct){
+    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const isDarkish = ['dark','cyberpunk','forest','sunset'].includes(theme);
+    if(pct === 0) return isDarkish ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
+    if(pct <= 25) return theme==='cyberpunk'?'rgba(255,0,200,0.25)': theme==='forest'?'rgba(0,255,65,0.2)': theme==='sunset'?'rgba(255,140,50,0.25)':'rgba(46,204,113,0.25)';
+    if(pct <= 50) return theme==='cyberpunk'?'rgba(255,0,200,0.45)': theme==='forest'?'rgba(0,255,65,0.4)': theme==='sunset'?'rgba(255,140,50,0.45)':'rgba(46,204,113,0.5)';
+    if(pct <= 75) return theme==='cyberpunk'?'rgba(255,0,200,0.7)': theme==='forest'?'rgba(0,255,65,0.65)': theme==='sunset'?'rgba(255,140,50,0.7)':'rgba(46,204,113,0.75)';
+    return theme==='cyberpunk'?'#FF00C8': theme==='forest'?'#00FF41': theme==='sunset'?'#FF8C32':'#27AE60';
+  }
+
+  function renderHeatmap(){
+    const cells = [];
+    for(let i=29; i>=0; i--){
+      const ds = addDays(todayStr(), -i);
+      const day = state.allDaysMap[ds] || state.dayCache[ds];
+      let pct = 0;
+      if(day && state.habits.length){
+        const done = state.habits.filter(h => day.habits && day.habits[h]).length;
+        pct = Math.round((done / state.habits.length) * 100);
+      }
+      const color = heatColor(pct);
+      cells.push(`<div class="heatmap-cell" style="background:${color};"><span class="heatmap-tip">${ds}: ${pct}%</span></div>`);
+    }
+    return `<div class="heatmap-grid">${cells.join('')}</div>`;
   }
 
   function computeStreak(){
@@ -1090,6 +1368,57 @@
       state.tab = 'today';
       return render();
     }
+
+    /* --- challenge events --- */
+    if(action==='challenge-tick'){
+      const idx = Number(el.dataset.idx);
+      const ch = state.challenges[idx];
+      if(!ch) return;
+      ch.completedDates = ch.completedDates || [];
+      if(!ch.completedDates.includes(ds)) ch.completedDates.push(ds);
+      await sSet('config:challenges', JSON.stringify(state.challenges));
+      return render();
+    }
+    if(action==='challenge-del'){
+      const idx = Number(el.dataset.idx);
+      state.challenges.splice(idx, 1);
+      await sSet('config:challenges', JSON.stringify(state.challenges));
+      return render();
+    }
+    if(action==='add-challenge'){
+      const sel = document.getElementById('challengeTemplate');
+      const customName = document.getElementById('challengeCustomName');
+      const customDays = document.getElementById('challengeCustomDays');
+      let name, days;
+      if(sel && sel.value === 'custom'){
+        name = customName ? customName.value.trim() : '';
+        days = customDays ? Number(customDays.value) : 7;
+        if(!name) return;
+      } else {
+        const tpl = CHALLENGE_TEMPLATES.find(t => t.name === sel.value);
+        if(!tpl) return;
+        name = tpl.name;
+        days = tpl.days;
+      }
+      if(!days || days < 1) return;
+      state.challenges.push({ id: uid(), name, days, completedDates: [], startDate: ds });
+      await sSet('config:challenges', JSON.stringify(state.challenges));
+      return render();
+    }
+  }
+
+  /* ---------- challenge template switcher (show/hide custom inputs) ---------- */
+  function bindChallengeFormEvents(){
+    const sel = document.getElementById('challengeTemplate');
+    const nameInput = document.getElementById('challengeCustomName');
+    const daysInput = document.getElementById('challengeCustomDays');
+    if(sel && nameInput && daysInput){
+      sel.addEventListener('change', () => {
+        const isCustom = sel.value === 'custom';
+        nameInput.style.display = isCustom ? '' : 'none';
+        daysInput.style.display = isCustom ? '' : 'none';
+      });
+    }
   }
 
   function escapeHtml(s){
@@ -1097,43 +1426,61 @@
   }
   function escapeAttr(s){ return escapeHtml(s); }
 
-  function setupThemeToggle(){
-    const sidebarBtn = document.getElementById('sidebarThemeToggle');
+  /* ---------- THEME STORE ---------- */
+  function renderThemeStore(){
+    const streak = computeStreak();
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const listEl = document.getElementById('themeStoreList');
+    if(!listEl) return;
+    listEl.innerHTML = THEMES.map(t => {
+      const unlocked = streak >= t.req;
+      const isActive = current === t.id;
+      return `
+        <div class="theme-swatch ${isActive?'active':''} ${!unlocked?'locked':''}" data-theme-id="${t.id}" style="cursor:${unlocked?'pointer':'not-allowed'}">
+          <div class="swatch-dot" style="background:${t.dot};"></div>
+          <span class="swatch-label">${t.label}</span>
+          ${isActive ? '<span class="swatch-badge">Active</span>' : ''}
+          ${!unlocked ? `<span class="swatch-badge">🔒 ${t.req}d streak</span>` : ''}
+        </div>
+      `;
+    }).join('');
+    listEl.querySelectorAll('.theme-swatch:not(.locked)').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.dataset.themeId;
+        document.documentElement.setAttribute('data-theme', id);
+        localStorage.setItem('theme', id);
+        // update mobile btn icon
+        const mobileBtn = document.getElementById('mobileThemeToggle');
+        if(mobileBtn) mobileBtn.textContent = ['light'].includes(id) ? '🌙' : '☀️';
+        renderThemeStore();
+      });
+    });
+
+    // mobile cycle button
     const mobileBtn = document.getElementById('mobileThemeToggle');
-    
-    function updateToggleUI(theme){
-      if(sidebarBtn) {
-        sidebarBtn.innerHTML = theme === 'dark' 
-          ? '<span class="mode-icon">☀️</span> Light Mode' 
-          : '<span class="mode-icon">🌙</span> Dark Mode';
-      }
-      if(mobileBtn) {
-        mobileBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
-      }
+    if(mobileBtn){
+      mobileBtn.onclick = () => {
+        const ids = THEMES.filter(t => streak >= t.req).map(t => t.id);
+        const cur = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = ids[(ids.indexOf(cur) + 1) % ids.length];
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        renderThemeStore();
+      };
     }
-    
-    function toggle(){
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      const target = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', target);
-      localStorage.setItem('theme', target);
-      updateToggleUI(target);
-    }
-    
-    if(sidebarBtn) sidebarBtn.addEventListener('click', toggle);
-    if(mobileBtn) mobileBtn.addEventListener('click', toggle);
-    
-    const initial = document.documentElement.getAttribute('data-theme') || 'light';
-    updateToggleUI(initial);
   }
 
   /* ---------- init ---------- */
   async function init(){
-    const raw = await sGet('config:habits');
-    state.habits = safeParse(raw, DEFAULT_HABITS.slice());
+    const [rawHabits, rawChallenges] = await Promise.all([
+      sGet('config:habits'),
+      sGet('config:challenges'),
+    ]);
+    state.habits = safeParse(rawHabits, DEFAULT_HABITS.slice());
+    state.challenges = safeParse(rawChallenges, []);
     await loadDay(state.selectedDate);
-    setupThemeToggle();
     render();
+    renderThemeStore();
   }
   init();
 })();
