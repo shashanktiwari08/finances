@@ -145,6 +145,42 @@ app.get('/api/storage/list', async (req, res) => {
   }
 });
 
+// Bulk get storage keys and values with prefix
+app.get('/api/storage/bulk', async (req, res) => {
+  const { prefix } = req.query;
+  if (prefix === undefined) {
+    return res.status(400).json({ error: 'Missing prefix parameter' });
+  }
+
+  if (pool) {
+    try {
+      const result = await pool.query('SELECT key, value FROM ledger_storage WHERE key LIKE $1', [`${prefix}%`]);
+      const data = {};
+      result.rows.forEach(row => {
+        let rawVal = row.value;
+        try {
+          data[row.key] = JSON.parse(rawVal);
+        } catch (e) {
+          data[row.key] = rawVal;
+        }
+      });
+      res.json({ data });
+    } catch (err) {
+      console.error('Database bulk error:', err);
+      res.status(500).json({ error: 'Database query error' });
+    }
+  } else {
+    const db = readDB();
+    const data = {};
+    Object.keys(db).forEach(k => {
+      if (k.startsWith(prefix)) {
+        data[k] = db[k];
+      }
+    });
+    res.json({ data });
+  }
+});
+
 // Serve frontend daily ledger page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'shashank-daily-ledger.html'));
